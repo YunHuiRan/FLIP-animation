@@ -15,7 +15,8 @@ async function FLIP() {
 
   const mode = await import("./end.vue");
   // @ts-ignore
-  preRenderRef.value?.renderComponent?.(mode.default, startRect);
+  preRenderRef.value?.renderComponent?.(mode.default, startRect, "end");
+  startRef.value.classList.add("hidden");
 }
 </script>
 

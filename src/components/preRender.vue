@@ -1,19 +1,22 @@
 <template>
-  <div ref="container" class="fixed top-0 left-0 zindex-[-9999]">
+  <div ref="container" class="invisible absolute pointer-events-none">
     <component :is="component" v-if="component" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, nextTick } from "vue";
+import router from "../router/index.ts";
 
 const container = ref();
 const component = shallowRef();
 
-async function renderComponent(comp: any, startRect: DOMRect) {
+async function renderComponent(comp: any, startRect: DOMRect, route: string) {
   component.value = comp;
   await nextTick();
-  const endRect = await container.value.firstElementChild.getBoundingClientRect();
+  const child = container.value?.firstElementChild;
+
+  const endRect = child.getBoundingClientRect();
   component.value = null;
 
   const clone = document.createElement("div");
@@ -24,18 +27,31 @@ async function renderComponent(comp: any, startRect: DOMRect) {
     top: startRect.top + "px",
     left: startRect.left + "px",
     background: "white",
-    transition: "all 0.5s ease-in-out",
   });
   document.body.appendChild(clone);
 
-  requestAnimationFrame(() => {
-    Object.assign(clone.style, {
-      width: endRect.width + "px",
-      height: endRect.height + "px",
-      top: endRect.top + "px",
-      left: endRect.left + "px",
-    });
-  });
+  const animation = clone.animate(
+    [
+      {
+        width: startRect.width + "px",
+        height: startRect.height + "px",
+        top: startRect.top + "px",
+        left: startRect.left + "px",
+      },
+      {
+        width: endRect.width + "px",
+        height: endRect.height + "px",
+        top: endRect.top + "px",
+        left: endRect.left + "px",
+      },
+    ],
+    { duration: 500, easing: "ease-in-out", fill: "forwards" }
+  );
+
+  await animation.finished;
+
+  router.push(`/${route}`);
+  document.body.removeChild(clone);
 }
 
 defineExpose({ renderComponent });
