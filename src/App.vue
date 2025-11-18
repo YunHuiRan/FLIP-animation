@@ -1,5 +1,7 @@
 <template>
-  <div class="bg-gray-500 w-screen h-screen flex justify-center items-center">
+  <div
+    class="bg-gray-500 w-[calc(100vw-10px)] h-[calc(100vh-10px)] flex justify-center items-center"
+  >
     <preRender ref="preRenderRef" />
 
     <RouterView></RouterView>
